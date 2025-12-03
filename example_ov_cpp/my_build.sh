@@ -1,17 +1,10 @@
-SCRIPT_DIR_EXAMPLE_OV_CPP="$(dirname "$(readlink -f "$BASH_SOURCE")")"
-cd ${SCRIPT_DIR_EXAMPLE_OV_CPP}
-
-source ../python-env/bin/activate
-source ../source_ov.sh
-
-cd ${SCRIPT_DIR_EXAMPLE_OV_CPP}
+/home/arda/ruonan/openvino/build/install/setupvars.sh
+export OpenVINO_DIR=/home/arda/ruonan/openvino/build
+export OpenCV_DIR=/home/arda/ruonan/opencv/build
+export OpenVINOGenAI_DIR=/home/arda/ruonan/openvino.genai/build
 
 mkdir -p build
 cd build
 
-# Based on myown build openvino.genai
-export CMAKE_PREFIX_PATH="../../openvino.genai/install/runtime/cmake/"
-
 cmake -DCMAKE_BUILD_TYPE=Debug ..
-# cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j32

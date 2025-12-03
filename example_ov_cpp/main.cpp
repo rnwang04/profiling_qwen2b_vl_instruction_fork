@@ -6,6 +6,7 @@
 #include <openvino/genai/visual_language/pipeline.hpp>
 #include <filesystem>
 #include <chrono>
+namespace fs = std::filesystem;
 
 bool print_subword(std::string &&subword)
 {
@@ -107,7 +108,7 @@ void test_video(const CTestParam &param, ov::genai::VLMPipeline &pipe, const std
     }
 #endif
 
-#if 0
+#if 1
     std::cout << "  test_video pass 'video' with one tensor " << std::endl;
     for (int i = 0; i < 1; i++)
     {
@@ -124,7 +125,7 @@ void test_video(const CTestParam &param, ov::genai::VLMPipeline &pipe, const std
     }
 #endif
 
-#if 1
+#if 0
     std::cout << "  test_video pass 'video' + 'images' " << std::endl;
     // std::vector<ov::Tensor> images = {rgbs[0]};
     // for (auto img: images) {
@@ -366,8 +367,8 @@ int test_qwen2_5_vl_custom_vit(int argc, char *argv[])
     else {
         std::cout << " == Use default param" << std::endl;
         param.device = "GPU";
-        param.model_path = "C:\\ov_task\\profiling_qwen2b_vl_instruction\\models\\ov\\Qwen2.5-VL-3B-Instruct\\INT4";
-        param.img_video_path = "C:\\ov_task\\profiling_qwen2b_vl_instruction\\custom_vit\\home.jpg";
+        param.model_path = "/mnt/disk2/models/WW46_llm-optimum_2025.4.0-20398-RC2/qwen2.5-vl-7b-instruct/pytorch/ov/OV_FP16-4BIT_DEFAULT";
+        param.img_video_path = "/home/arda/ruonan/mengnalisa.jpg";
         param.prompt = "Please describe the image.";
         param.prompt2 = "How many chairs in this image?";
         set_env("CUSTOM_VIT_PATH", "C:\\ov_task\\profiling_qwen2b_vl_instruction\\custom_vit");
@@ -434,7 +435,7 @@ int main(int argc, char *argv[])
         // return test_cb_add_request_vs_vlm();
         // return test_chat_with_video_image();
         // return test_vlm_add_extension();
-        return test_vllm_eagle3(argc, argv);
+        // return test_vllm_eagle3(argc, argv);
         // return test_qwen2_5_vl_custom_vit(argc, argv);
 
         auto param = CTestParam();
@@ -454,7 +455,21 @@ int main(int argc, char *argv[])
 
         if (param.input_video)
         {
-            ov::Tensor video = utils::load_video(param.img_video_path);
+            ov::Tensor video;
+            if (fs::is_regular_file(param.img_video_path)) {
+                std::string extension = param.img_video_path.substr(param.img_video_path.length() - 4);
+
+                std::transform(extension.begin(), extension.end(), extension.begin(),
+                            [](unsigned char c){ return std::tolower(c); });
+
+                if (extension == ".mp4") {
+                    video = utils::load_and_sample_video(param.img_video_path);
+                } else {
+                    video = utils::load_video(param.img_video_path);
+                }
+            } else {
+                video = utils::load_video(param.img_video_path);
+            }
             test_video(param, pipe, {}, video);
         }
         else

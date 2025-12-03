@@ -11,6 +11,7 @@ namespace utils {
 ov::Tensor load_image(const std::filesystem::path& image_path);
 std::vector<ov::Tensor> load_images(const std::filesystem::path& image_path);
 ov::Tensor load_video(const std::filesystem::path& input_path);
+ov::Tensor load_and_sample_video(const std::filesystem::path& video_path);
 ov::Tensor create_countdown_frames();
 }
 

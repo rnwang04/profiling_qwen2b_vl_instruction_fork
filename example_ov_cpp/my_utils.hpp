@@ -85,8 +85,8 @@ class CTestParam {
         std::cout << "    prompt2 = " << prompt2 << std::endl;
     }
 
-    std::string img_video_path = "../../cat_1.jpg";
-    std::string model_path = "../../ov_model_i8/";
+    std::string img_video_path = "/home/arda/ruonan/mengnalisa.jpg";
+    std::string model_path = "/mnt/disk2/models/WW46_llm-optimum_2025.4.0-20398-RC2/qwen2.5-vl-7b-instruct/pytorch/ov/OV_FP16-4BIT_DEFAULT";
     bool input_video = true;
     std::string device = "GPU";
     std::string prompt;
