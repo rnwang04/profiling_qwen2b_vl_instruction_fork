@@ -247,13 +247,13 @@ int test_cb_add_request_vs_vlm()
 int test_chat_with_video_image() {
     std::cout << "== Start test_chat_with_video_image" << std::endl;
 
-	std::vector<std::string> system_message = { "", "You are a helpful assistant." };
-    std::string models_path = "C:\\Users\\openvino-ci-88\\xiping\\profiling_qwen2b_vl_instruction\\katuni4ka\\tiny-random-qwen2.5-vl\\INT4";
-    models_path = "C:\\ov_task\\profiling_qwen2b_vl_instruction\\openvino.genai\\tests\\python_tests\\ov_cache\\20251022\\optimum-intel-1.26.0.dev0+04db016_transformers-4.53.3\\test_models\\katuni4ka\\tiny-random-qwen2vl";
+	std::vector<std::string> system_message = { "You are a helpful assistant." };
+    std::string models_path = "/mnt/disk2/models/WW46_llm-optimum_2025.4.0-20398-RC2/qwen2.5-vl-7b-instruct/pytorch/ov/OV_FP16-4BIT_DEFAULT";
 #ifndef _WIN32
-    models_path = "../openvino.genai/tests/python_tests/ov_cache/20251015/optimum-intel-1.25.2_transformers-4.53.3/test_models/katuni4ka_tiny-random-qwen2vl/";
+    models_path = "/mnt/disk2/models/WW46_llm-optimum_2025.4.0-20398-RC2/qwen2.5-vl-7b-instruct/pytorch/ov/OV_FP16-4BIT_DEFAULT";
 #endif
-    std::vector<std::string> attention_backend = { "PA", "SDPA" };
+    // std::vector<std::string> attention_backend = { "PA", "SDPA" };
+    std::vector<std::string> attention_backend = { "SDPA" };
 
     auto img = ov::Tensor(ov::element::u8, ov::Shape({ 667,1000,3 }));
     auto video = ov::Tensor(ov::element::u8, ov::Shape({ 10, 32, 32, 3 }));
@@ -282,7 +282,7 @@ int test_chat_with_video_image() {
         ov::genai::images(images), 
         ov::genai::videos(videos), ov::genai::generation_config(generation_config)
     );
-      
+
     for (size_t idx = 1; idx < iteration_images.size(); idx++) {
         std::cout << "== idx = " << idx << std::endl;
         std::cout << "  == iteration_images[idx].size() = " << iteration_images[idx].size() << std::endl;
@@ -433,7 +433,7 @@ int main(int argc, char *argv[])
         // return test_llm_lookup(argc, argv);
         // return test_vllm_lookup(argc, argv);
         // return test_cb_add_request_vs_vlm();
-        // return test_chat_with_video_image();
+        return test_chat_with_video_image();
         // return test_vlm_add_extension();
         // return test_vllm_eagle3(argc, argv);
         // return test_qwen2_5_vl_custom_vit(argc, argv);
