@@ -83,10 +83,19 @@ int test_cb_add_request_vs_vlm_benchmark(const CTestParam &param, ov::Tensor &vi
     generation_config.apply_chat_template = false;
     std::cout << "==== Test vlm pipe with image in prompt." << std::endl;
     auto complete_template = "<|im_start|>system\n" + sys_prompt + "<|im_end|>\n<|im_start|>user\n" + "<|image_1|>\n" + prompt + "<|im_end|>\n<|im_start|>assistant\n";
+    ov::AnyMap config;
+    config["use_batch_vit"] = true;
+    ov::genai::StreamerVariant streamer = std::monostate(); 
     for (int i = 0; i < num_iters; i++) {
+        // auto res_vlm_1 = ov_pipe.generate(complete_template,
+        //                                   ov::genai::images(std::vector<ov::Tensor>{video}),
+        //                                   ov::genai::generation_config(generation_config));
         auto res_vlm_1 = ov_pipe.generate(complete_template,
-                                          ov::genai::images(std::vector<ov::Tensor>{video}),
-                                          ov::genai::generation_config(generation_config));
+                                          std::vector<ov::Tensor>{video},
+                                          std::vector<ov::Tensor>{},
+                                          generation_config,
+                                          streamer,
+                                          config);
         res_vlm_vec.push_back(res_vlm_1.texts[0]);
         std::cout << "    == get_prepare_embeddings_duration = " << res_vlm_1.perf_metrics.get_prepare_embeddings_duration().mean << std::endl;
         std::cout << "    == TTFT = " << res_vlm_1.perf_metrics.get_ttft().mean << " +- " << res_vlm_1.perf_metrics.get_ttft().std << std::endl;
@@ -95,8 +104,8 @@ int test_cb_add_request_vs_vlm_benchmark(const CTestParam &param, ov::Tensor &vi
 
     auto scheduler_config = ov::genai::SchedulerConfig();
     // scheduler_config.enable_prefix_caching = false;
-    // scheduler_config.dynamic_split_fuse = true;
-    // scheduler_config.max_num_batched_tokens = 2400;
+    scheduler_config.dynamic_split_fuse = false;
+    scheduler_config.max_num_batched_tokens = 2400;
     auto cb_pipe = ov::genai::ContinuousBatchingPipeline(
         param.model_path,
         scheduler_config,
@@ -109,8 +118,10 @@ int test_cb_add_request_vs_vlm_benchmark(const CTestParam &param, ov::Tensor &vi
     std::vector<ov::genai::GenerationHandle> handles;
     generation_config.apply_chat_template = false;
     for (int i = 0; i < num_iters; i++) {
-        auto handle = cb_pipe.add_request(i, complete_template, std::vector<ov::Tensor>{video},
-                                          generation_config);
+        auto handle = cb_pipe.add_request(i, complete_template,
+                                          std::vector<ov::Tensor>{video},
+                                          generation_config,
+                                          config);
         handles.push_back(handle);
     }
 
